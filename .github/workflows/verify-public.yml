@@ -1,0 +1,24 @@
+name: Verify public Track 1 image
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Anonymous image pull
+        run: |
+          export DOCKER_CONFIG="$(mktemp -d)"
+          docker pull ghcr.io/mehedi-bepary/deltanlp-agenthon-track1@sha256:43877956edb0201f7cee292af329f7d677367c2154c556150327f06033c297da
+      - name: Test exact public image under restrictions
+        run: |
+          unzip -q agenthon-track1-source.zip -d source
+          docker run --rm --network=none --user 65534:65534 --read-only \
+            --tmpfs /tmp:rw,noexec,nosuid,nodev,size=64m --pids-limit 256 \
+            --ulimit nofile=1024:1024 --ulimit nproc=256:256 \
+            -e DELTANLP_TEST_ROOT=/tmp -v "$PWD/source/tests:/agent/tests:ro" --entrypoint python \
+            ghcr.io/mehedi-bepary/deltanlp-agenthon-track1@sha256:43877956edb0201f7cee292af329f7d677367c2154c556150327f06033c297da /agent/tests/test_agent.py
+          echo 'Anonymous pull and constrained tests passed for sha256:43877956edb0201f7cee292af329f7d677367c2154c556150327f06033c297da' >> "$GITHUB_STEP_SUMMARY"
