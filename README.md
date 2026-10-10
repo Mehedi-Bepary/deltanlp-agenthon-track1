@@ -6,7 +6,7 @@ The agent inspects each task's instruction, card, visible checker source and dat
 
 ## Verified locally
 
-- Nine synthetic harness tests passed on Python 3.13: failed-test repair, malformed-code recovery, credential/canary redaction, missing-test handling, subprocess timeout, canary rejection, reward-file rejection, stale-report protection and restoring the best partial candidate after worse repairs.
+- Eleven synthetic harness tests passed on Python 3.13, covering repair and best-candidate recovery, timeout handling, secret/canary protection, stale reports, archive inspection and the House request contract. Two additional spreadsheet/Parquet schema tests require image dependencies and are pending Linux verification.
 - Task-context inspection succeeded on all 86 public units at official commit `3fa6e295601b18e0427502117a26ac4fcf32cdb2`; source files were unchanged. See `practice-audit.json`. This is an inspection audit, **not 86 solved tasks**.
 - Linux Docker compatibility, dependency installation and real House-model execution still require testing.
 
@@ -15,6 +15,8 @@ The agent inspects each task's instruction, card, visible checker source and dat
 Reads the card's agent timeout; caps work at 420 seconds per unit to limit total-roster exhaustion. The eight repair attempts plus one planning request are below the 25-request maximum, and every request caps output at 4,000 tokens. Admitted failures are counted conservatively. Uses fixed temperature 0 and the injected `QFBENCH_SEED`; disables default thinking to reserve output space for executable code. Neither this setting nor the budget is yet optimized on official evaluations.
 
 The generated program receives no model credential or proxy credentials. The supervisor alone calls the approved House endpoint. The image contains only our general agent code and pinned libraries. All task inspection happens after the organizer mounts the new unit.
+
+Binary inputs receive runtime schema inspection: spreadsheet sheet names/first rows, Parquet columns/row counts, and archive member names/sizes without extraction. No prepared per-unit solution is included.
 
 ## Research and design rationale
 
